@@ -339,9 +339,18 @@ preg_match('/\">('.preg_quote(htmlspecialchars($safe)).') (- )?(.*)<\/span>/i',$
 $e=s_t($matches[2]!='- '?'/me '.$matches[3]:$matches[3]);
 }
 else{
-preg_match("/\/pm ([0-9]{3})([0-9]{3})-\^!/i",$file[abs(intval($_REQUEST['reply']))],$x);
-preg_match('/\">('.preg_quote(htmlspecialchars($safe)).') (- )?(.*)<\/span>/i',$file[abs(intval($_REQUEST['reply']))],$matches);
-$e='/pm '.$x[1].' '.s_t($matches[2]!='- '?'/me '.$matches[3]:$matches[3]);}
+preg_match("/\/pm ([0-9]{3})([0-9]{3})-\^!/i", $file[abs(intval($_REQUEST['reply']))], $x);
+preg_match('/\">(' . preg_quote(htmlspecialchars($safe)) . ') (- )?(.*)<\/span>/i', $file[abs(intval($_REQUEST['reply']))], $matches);
+// Determine which 3-digit id is the other participant (not the current user)
+$targetId = '';
+if (isset($x[1]) && isset($x[2])) {
+    // If current user's crc() equals the first id, use the second; otherwise use the first
+    $targetId = ($x[1] == crc()) ? $x[2] : $x[1];
+} else {
+    // Fallback: use whatever we have (preserves existing behaviour if regex didn't match)
+    $targetId = $x[1] ?? '';
+}
+$e = '/pm ' . $targetId . ' ' . s_t($matches[2] != '- ' ? '/me ' . $matches[3] : $matches[3]);}
 echo' value="'.str_replace('magicCcCcCcCcC','magic',str_replace('o--0-oo-0--oo0---oo00--oo00-oo',':whirl:',str_replace('style="background:#f44"','',$e))).'"';}echo'" size="54" autofocus="true" id="a"><script>setTimeout(function(){var a=document.getElementById("a");a.focus();a.selectionStart=a.selectionEnd='.($config[1]??500).';},0);</script>';#https://stackoverflow.com/questions/511088/use-javascript-to-place-cursor-at-end-of-text-in-text-input-element
 
 if(isset($_REQUEST['show'])){
